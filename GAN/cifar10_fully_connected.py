@@ -20,8 +20,10 @@ class Generator(nn.Module):
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
             nn.Linear(hidden_dim, hidden_dim),
-            nn.Sigmoid(),
+            nn.ReLU(),
+            # nn.Sigmoid(),
             nn.Linear(hidden_dim, output_dim),
+            nn.Sigmoid(),
         )
         self.initialize_weights()
 
@@ -31,7 +33,9 @@ class Generator(nn.Module):
     def initialize_weights(self) -> None:
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                nn.init.uniform_(m.weight, -0.005, 0.005)
+                if m.weight.shape[0] == 3072:
+                    nn.init.uniform_(m.weight, -0.005, 0.005)
+                else: nn.init.uniform_(m.weight, -0.005, 0.005)
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
