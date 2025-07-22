@@ -11,16 +11,18 @@ class Generator(nn.Module):
         
         self.projection = nn.Linear(100, 1024 * 4 * 4, bias=False)
         self.net = nn.Sequential(
-            nn.ConvTranspose2d(in_channels=1024, out_channels=512, kernel_size=2, stride=2, bias=False),
+            nn.BatchNorm2d(1024),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(in_channels=1024, out_channels=512, kernel_size=4, stride=2, bias=False, padding=1),
             nn.BatchNorm2d(512),
-            nn.ReLU(),
-            nn.ConvTranspose2d(in_channels=512, out_channels=256, kernel_size=2, stride=2, bias=False),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(in_channels=512, out_channels=256, kernel_size=4, stride=2, bias=False, padding=1),
             nn.BatchNorm2d(256),
-            nn.ReLU(),
-            nn.ConvTranspose2d(in_channels=256, out_channels=128, kernel_size=2, stride=2, bias=False),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(in_channels=256, out_channels=128, kernel_size=4, stride=2, bias=False, padding=1),
             nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.ConvTranspose2d(in_channels=128, out_channels=3, kernel_size=2, stride=2, bias=False),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(in_channels=128, out_channels=3, kernel_size=4, stride=2, bias=False, padding=1),
             nn.Tanh()
         )
         self.initialize_weights()
@@ -34,6 +36,12 @@ class Generator(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.ConvTranspose2d):
                 nn.init.normal_(m.weight, 0, 0.02)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.02)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.normal_(m.weight, 0, 0.02)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
 
 
 class Discriminator(nn.Module):
@@ -41,16 +49,18 @@ class Discriminator(nn.Module):
         super().__init__()
 
         self.net = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=128, kernel_size=5, stride=2, bias=False),
-            nn.BatchNorm2d(128), 
-            nn.LeakyReLU(0.2),
-            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=5, stride=2, bias=False),
+            nn.Conv2d(in_channels=3, out_channels=128, kernel_size=4, stride=2, bias=False, padding=1),
+            nn.LeakyReLU(0.2, True),
+            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=4, stride=2, bias=False, padding=1),
             nn.BatchNorm2d(256), 
-            nn.LeakyReLU(0.2),
-            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=5, stride=2, bias=False),
+            nn.LeakyReLU(0.2, True),
+            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=4, stride=2, bias=False, padding=1),
             nn.BatchNorm2d(512), 
-            nn.LeakyReLU(0.2),
-            nn.Conv2d(in_channels=512, out_channels=1, kernel_size=5, stride=2, bias=False),
+            nn.LeakyReLU(0.2, True),
+            nn.Conv2d(in_channels=512, out_channels=1024, kernel_size=4, stride=2, bias=False, padding=1),
+            nn.BatchNorm2d(1024),
+            nn.LeakyReLU(0.2, True),
+            nn.Conv2d(in_channels=1024, out_channels=1, kernel_size=4, stride=2, bias=False, padding=1),
             nn.Flatten(start_dim=1),
             nn.Sigmoid()
         )
@@ -63,6 +73,10 @@ class Discriminator(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.normal_(m.weight, 0, 0.02)
+            elif isinstance(m, nn.BatchNorm2d):
+                nn.init.normal_(m.weight, 0, 0.02)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
 
 
 class GeneratorLoss(nn.Module):

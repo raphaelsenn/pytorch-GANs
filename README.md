@@ -67,14 +67,14 @@ This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional G
 #### CelebFaces (deep convolutional version)
 
 <div style="text-align: center;":>
-      <img src="./res/celebfaces_dcgan.gif" width="400">
+      <img src="./res/dcgan_celebfaces.gif" width="400">
 </div>
 
 
 
-| Epoch 01 | Epoch 75 |Loss |
-| --------- | ---------- |-----------|
-| ![celebfaces_dcgan](./res/dcgan_celebfaces_01.png) | ![celebfaces_dcgan](./res/dcgan_celebfaces_75.png)| ![cifar10_fc_loss_vanilla](./res/vannila_gan_loss_cifar.png)|
+| Epoch 01 | Epoch 50 | Loss |
+| --------- | ---------- | ------- | 
+| ![celebfaces_dcgan](./res/dcgan_celebfaces_00.png) | ![celebfaces_dcgan](./res/dcgan_celebfaces_50.png) | ![dcgan_loss_celeb](./res/dcgan_loss_cifar.png)|
 
 ## Citations
 
