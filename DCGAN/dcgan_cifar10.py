@@ -6,6 +6,13 @@ EPSILON = 1e-8
 
 
 class Generator(nn.Module):
+    """
+    Implementation of the CIFAR10-Generator.
+ 
+    Reference:
+    Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks, Radford et al., 2016;
+    https://arxiv.org/abs/1511.06434
+    """ 
     def __init__(self, nz: int=100) -> None:
         super().__init__() 
         
@@ -42,6 +49,13 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
+    """
+    Implementation of the CIFAR10-Discriminator.
+ 
+    Reference:
+    Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks, Radford et al., 2016;
+    https://arxiv.org/abs/1511.06434
+    """  
     def __init__(self):
         super().__init__()
 

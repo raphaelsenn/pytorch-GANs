@@ -9,7 +9,7 @@ EPSILON = 1e-8
 
 class Generator(nn.Module):
     """
-    Implementation of the CIFAR10-Generator of the vanilla gan paper.
+    Implementation of the CIFAR10-Generator from the vanilla gan paper.
 
     Reference:
     Generative Adversarial Networks, Goodfellow et al. 2014; https://arxiv.org/abs/1406.2661
@@ -37,11 +37,11 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
     """
-    Implementation of the CIFAR10-Discriminator of the vanilla gan paper.
-
+    Implementation of the CIFAR10-Discriminator from the vanilla gan paper.
+ 
     Reference:
     Generative Adversarial Networks, Goodfellow et al. 2014; https://arxiv.org/abs/1406.2661
-    """   
+    """  
     def __init__(self, input_dim: int=48*48, hidden_dim: int=1200, output_dim:int=1) -> None:
         super().__init__()
         self.net = nn.Sequential(

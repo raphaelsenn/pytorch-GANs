@@ -216,5 +216,6 @@ celeb_faces
 celeb_faces_gray_images
 celebfaces_dcgan_images
 cifar10_dcgan_images
+mnist_cgan_images
 
 *.pth

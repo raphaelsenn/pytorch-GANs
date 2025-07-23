@@ -7,6 +7,8 @@ PyTorch implementations of various GAN papers/architectures like GAN (Goodfellow
 
 * [Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks (Radford et al., 2016)](https://arxiv.org/abs/1511.06434)
 
+* [Conditional Generative Adversarial Nets (Mirza et al., 2014)](https://arxiv.org/abs/1411.1784)
+
 ## Generative Adversarial Networks (Goodfellow et al., 2014)
 This code tries to reproduce the 2014 Goodfellow et al. paper [Generative Adversarial Networks](https://arxiv.org/abs/1406.2661).
 
@@ -64,7 +66,10 @@ Discriminator:
 ## Deep Convolutional Generative Adversarial Networks (Radford et al. 2016)
 This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional Generative Adversarial Networks](https://arxiv.org/abs/1511.06434).
 
-#### CelebFaces (deep convolutional version)
+![dcgan_generator](./res/DCGAN_generator.png)
+*Figure 1: The architecture of the DCGAN generator used for CelebFaces modeling; Taken from Radford et al., 2016.*
+
+#### CelebFaces (deep convolutional model)
 
 <div style="text-align: center;":>
       <img src="./res/dcgan_celebfaces.gif" width="400">
@@ -75,6 +80,27 @@ This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional G
 | Epoch 01 | Epoch 50 | Loss |
 | --------- | ---------- | ------- | 
 | ![celebfaces_dcgan](./res/dcgan_celebfaces_00.png) | ![celebfaces_dcgan](./res/dcgan_celebfaces_50.png) | ![dcgan_loss_celeb](./res/dcgan_loss_cifar.png)|
+
+##### About the CelebFaces dataset
+The dataset was taken from kaggle.
+Link to the dataset can be found [here](https://www.kaggle.com/datasets/jessicali9530/celeba-dataset).
+
+
+## Conditional Generative Adversarial Nets
+This code tries to reproduce the 2014 Mirza et al. paper [Conditional Generative Adversarial Nets](https://arxiv.org/abs/1411.1784).
+
+![cgan](./res/cgan_architecture.png)
+*Architecture of an conditional generative adversarial net; Taken from Mirza et al., 2014.*
+
+#### MNIST (fully connected model)
+
+<div style="text-align: center;":>
+      <img src="./res/cgan_mnist.gif" width="400">
+</div>
+
+| Epoch 001 | Epoch 100 | Loss |
+| --------- | ---------- | ------- | 
+| ![cgan_mnist](./res/cgan_mnist_fc_001.png) | ![cgan](./res/cgan_mnist_fc_100.png) | ![cgan_loss_mnist](./res/cgan_mnist_fc_loss.png)|
 
 ## Citations
 
@@ -99,5 +125,29 @@ This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional G
       archivePrefix={arXiv},
       primaryClass={cs.LG},
       url={https://arxiv.org/abs/1511.06434}, 
+}
+```
+
+```bibtex
+@misc{mirza2014conditionalgenerativeadversarialnets,
+      title={Conditional Generative Adversarial Nets}, 
+      author={Mehdi Mirza and Simon Osindero},
+      year={2014},
+      eprint={1411.1784},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/1411.1784}, 
+}
+```
+
+```bibtex
+@misc{liu2015celeba,
+  title        = {CelebA: Large-scale CelebFaces Attributes Dataset},
+  author       = {Z. Liu and P. Luo and X. Wang and X. Tang},
+  year         = {2015},
+  howpublished = {\url{https://www.kaggle.com/datasets/jessicali9530/celeba-dataset}},
+  note         = {Original dataset by MMLAB, The Chinese University of Hong Kong},
+  institution  = {Kaggle},
+  keywords     = {face recognition, facial attributes, dataset}
 }
 ```

@@ -11,10 +11,16 @@ from GAN.mnist_fully_connected import (
     DiscriminatorLoss
 )
 
+
 def initialize_device() -> torch.device:
     if torch.cuda.is_available(): return torch.device('cuda')
     elif torch.backends.mps.is_available(): return torch.device('mps')
     else: return torch.device('cpu')
+
+
+def set_seed(seed: int=42) -> None:
+    torch.manual_seed(seed)
+    if torch.cuda.is_available(): torch.cuda.manual_seed(seed)
 
 
 def load_mnist(root: str='./mnist/', batch_size: int=256) -> tuple[DataLoader, DataLoader]:
@@ -37,8 +43,7 @@ def load_mnist(root: str='./mnist/', batch_size: int=256) -> tuple[DataLoader, D
 
 if __name__ == '__main__':
     device = initialize_device()
-    seed = 42
-    torch.manual_seed(seed)
+    set_seed(seed=42)
 
     # Create generator and discriminator
     G = Generator().to(device)
@@ -88,7 +93,7 @@ if __name__ == '__main__':
             z = torch.distributions.uniform.Uniform(low=-1, high=1).sample([x.shape[0], 100]).to(device)
             D_G_z = D(G(z))
 
-            # update generator by descending its stochastic gradient
+            # update generator by ascending its stochastic gradient
             optimizer_G.zero_grad()
             loss_g = criterion_G(D_G_z)
             loss_g.backward()

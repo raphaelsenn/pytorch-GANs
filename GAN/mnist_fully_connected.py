@@ -9,7 +9,7 @@ EPSILON = 1e-8
 
 class Generator(nn.Module):
     """
-    Implementation of the MNIST-Generator of the vanilla gan paper.
+    Implementation of the MNIST-Generator from the vanilla gan paper.
 
     Reference:
     Generative Adversarial Networks, Goodfellow et al. 2014; https://arxiv.org/abs/1406.2661
