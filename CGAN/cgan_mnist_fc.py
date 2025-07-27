@@ -34,9 +34,7 @@ class Generator(nn.Module):
         self.dropout_y = nn.Dropout(0.2) 
         
         self.out = nn.Sequential(
-            # nn.Dropout(0.5),
             nn.Linear(hz + hy, h2),
-            # nn.Dropout(0.5),
             nn.ReLU(),
             nn.Linear(h2, nout),
             nn.Sigmoid()
