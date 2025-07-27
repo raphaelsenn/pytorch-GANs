@@ -217,5 +217,7 @@ celeb_faces_gray_images
 celebfaces_dcgan_images
 cifar10_dcgan_images
 mnist_cgan_images
+celeba
 
 *.pth
+*.DS_Store

@@ -75,8 +75,6 @@ This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional G
       <img src="./res/dcgan_celebfaces.gif" width="400">
 </div>
 
-
-
 | Epoch 01 | Epoch 50 | Loss |
 | --------- | ---------- | ------- | 
 | ![celebfaces_dcgan](./res/dcgan_celebfaces_00.png) | ![celebfaces_dcgan](./res/dcgan_celebfaces_50.png) | ![dcgan_loss_celeb](./res/dcgan_loss_cifar.png)|
@@ -84,6 +82,14 @@ This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional G
 ##### About the CelebFaces dataset
 The dataset was taken from kaggle.
 Link to the dataset can be found [here](https://www.kaggle.com/datasets/jessicali9530/celeba-dataset).
+
+Reproducibility:
+
+Download the [CelebA dataset](https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html) and place the images and attribute CSV in a folder called `celeba`.  
+
+```python
+dataset = CelebA(csv_file="list_attr_celeba.csv", root_dir="img_align_celeba", transform=...)
+```
 
 
 ## Conditional Generative Adversarial Nets

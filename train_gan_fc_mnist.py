@@ -4,7 +4,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 from torchvision.transforms import transforms
 
-from GAN.mnist_fully_connected import (
+from GAN.gan_mnist_fc import (
     Generator,
     Discriminator,
     GeneratorLoss,
