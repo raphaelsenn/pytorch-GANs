@@ -79,6 +79,9 @@ This code tries to reproduce the 2016 Radford et al. paper [Deep Convolutional G
 | --------- | ---------- | ------- | 
 | ![celebfaces_dcgan](./res/dcgan_celebfaces_00.png) | ![celebfaces_dcgan](./res/dcgan_celebfaces_50.png) | ![dcgan_loss_celeb](./res/dcgan_loss_cifar.png)|
 
+![dcgan_celeba_12X12](./res/celebfaces12x12.png)
+*More images generated usinig DCGAN.*
+
 ##### About the CelebFaces dataset
 The dataset was taken from kaggle.
 Link to the dataset can be found [here](https://www.kaggle.com/datasets/jessicali9530/celeba-dataset).

@@ -1,3 +1,8 @@
+"""
+Author: Raphael Senn <raphaelsenn@gmx.de>
+Initial coding: 2025-07-23
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,7 +15,7 @@ EPSILON = 1e-8
 
 class Generator(nn.Module):
     """
-    Implementation of the conditional MNIST-Generator.
+    Implementation of the conditional generator (MNIST Mirza et al., 2014).
 
     Reference:
     Conditional Generative Adversarial Nets, Mirza et al. 2014;
@@ -18,37 +23,41 @@ class Generator(nn.Module):
     """
     def __init__(
             self,
-            nz: int=100,
-            ny: int=10,
-            hz: int=200,
-            hy: int=1000,
-            h2: int=1200,
-            nout: int=784
+            z_dim: int=100,
+            y_dim: int=10,
+            z_hdim: int=200,
+            y_hdim: int=1000,
+            hidden_dim: int=1200,
+            out_dim: int=784
     ) -> None:
         super().__init__()
 
-        self.dropout_z = nn.Dropout(0.2) 
-        self.fc_z = nn.Linear(nz, hz)
+        self.fc_z = nn.Sequential(
+            nn.Linear(z_dim, z_hdim),
+            nn.ReLU(True)
+        )
 
-        self.fc_y = nn.Linear(ny, hy)
-        self.dropout_y = nn.Dropout(0.2) 
+        self.fc_y = nn.Sequential(
+            nn.Linear(y_dim, y_hdim),
+            nn.ReLU(True),
+        ) 
         
         self.out = nn.Sequential(
-            nn.Linear(hz + hy, h2),
-            nn.ReLU(),
-            nn.Linear(h2, nout),
+            nn.Linear(z_hdim + y_hdim, hidden_dim),
+            nn.ReLU(True),
+            nn.Linear(hidden_dim, out_dim),
             nn.Sigmoid()
         )
 
-        self.initialize_weights()
+        self._initialize_weights()
 
     def forward(self, z: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        h_z = F.relu(self.fc_z(z))              # [N, hz]
-        h_y = F.relu(self.fc_y(y))              # [N, hy]
-        h = torch.cat([h_z, h_y], dim=1)        # [N, hz + hy]
+        h_z = self.fc_z(z)
+        h_y = self.fc_y(y)
+        h = torch.cat([h_z, h_y], dim=1)
         return self.out(h)
     
-    def initialize_weights(self) -> None:
+    def _initialize_weights(self) -> None:
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.uniform_(m.weight, -0.005, 0.005)
@@ -58,44 +67,54 @@ class Generator(nn.Module):
 
 class Discriminator(nn.Module):
     """
-    Implementation of the conditional MNIST-Discriminator.
+    Implementation of the conditional discriminator (MNIST, Mirza et al., 2014).
 
     Reference:
-    Conditional Generative Adversarial Nets, Mirza et al. 2014;
+    Conditional Generative Adversarial Nets, Mirza et al., 2014;
     https://arxiv.org/abs/1411.1784
     """  
     def __init__(
             self,
-            nx: int=784,
-            ny: int=10,
-            hx: int=240,
-            hy: int=50,
-            h2: int=240
+            x_dim: int=784,
+            y_dim: int=10,
+            x_hdim: int=240,
+            y_hdim: int=50,
+            hidden_dim: int=240,
+            x_pieces: int=5,
+            y_pieces: int=5,
+            hidden_pieces: int=4,
+            x_dropout: float=0.2,
+            y_dropout: float=0.2,
+            hidden_dropout: float=0.5
     ) -> None:
         super().__init__()
+
+        self.maxout_x = nn.Sequential(
+            nn.Dropout(x_dropout),
+            Maxout(x_dim, x_hdim, x_pieces)
+        )
         
-        self.dropout_x = nn.Dropout(0.2) 
-        self.maxout_x = Maxout(nx, num_units=hx, num_pieces=5)
-        
-        self.dropout_y = nn.Dropout(0.2) 
-        self.maxout_y = Maxout(ny, num_units=hy, num_pieces=5)
-        
+        self.maxout_y = nn.Sequential(
+            nn.Dropout(y_dropout),
+            Maxout(y_dim, y_hdim, y_pieces)
+        )
+
         self.out = nn.Sequential(
-            nn.Dropout(0.5),
-            Maxout(hx + hy, num_units=h2, num_pieces=4),
-            nn.Dropout(0.5),
-            nn.Linear(h2, 1),
+            nn.Dropout(hidden_dropout),
+            Maxout(x_hdim + y_hdim, num_units=hidden_dim, num_pieces=hidden_pieces),
+            nn.Dropout(hidden_dropout),
+            nn.Linear(hidden_dim, 1),
             nn.Sigmoid()
         )
-        self.initialize_weights()
+        self._initialize_weights()
 
     def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        hx = self.maxout_x(self.dropout_x(x))
-        hy = self.maxout_y(self.dropout_y(y))
+        hx = self.maxout_x(x)
+        hy = self.maxout_y(y)
         h = torch.cat([hx, hy], dim=1)
         return self.out(h)
 
-    def initialize_weights(self) -> None:
+    def _initialize_weights(self) -> None:
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.uniform_(m.weight, -0.005, 0.005)

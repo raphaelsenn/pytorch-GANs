@@ -1,3 +1,8 @@
+"""
+Author: Raphael Senn <raphaelsenn@gmx.de>
+Initial coding: 2025-07-18
+"""
+
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -18,33 +23,67 @@ class Generator(nn.Module):
     Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks, Radford et al., 2016;
     https://arxiv.org/abs/1511.06434
     """
-    def __init__(self, nz: int=100) -> None:
+    def __init__(
+            self, 
+            z_dim: int=100,
+            channels_img: int=3,
+            features_g: int=128
+        ) -> None:
         super().__init__() 
         
-        self.projection = nn.Linear(nz, 1024 * 4 * 4, bias=False)
+        self.projection = nn.Linear(z_dim, features_g * 8 * 4 * 4, bias=False)
+        self.features_g = features_g
         self.net = nn.Sequential(
-            nn.BatchNorm2d(1024),
+            nn.BatchNorm2d(8 * features_g),
             nn.ReLU(True),
-            nn.ConvTranspose2d(in_channels=1024, out_channels=512, kernel_size=4, stride=2, bias=False, padding=1),
-            nn.BatchNorm2d(512),
+            nn.ConvTranspose2d(
+                in_channels=8*features_g, 
+                out_channels=4*features_g, 
+                kernel_size=4, 
+                stride=2, 
+                padding=1,
+                bias=False, 
+            ),
+            nn.BatchNorm2d(4*features_g),
             nn.ReLU(True),
-            nn.ConvTranspose2d(in_channels=512, out_channels=256, kernel_size=4, stride=2, bias=False, padding=1),
-            nn.BatchNorm2d(256),
+            nn.ConvTranspose2d(
+                in_channels=4*features_g, 
+                out_channels=2*features_g, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
+            nn.BatchNorm2d(2*features_g),
             nn.ReLU(True),
-            nn.ConvTranspose2d(in_channels=256, out_channels=128, kernel_size=4, stride=2, bias=False, padding=1),
-            nn.BatchNorm2d(128),
+            nn.ConvTranspose2d(
+                in_channels=2*features_g, 
+                out_channels=features_g, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
+            nn.BatchNorm2d(features_g),
             nn.ReLU(True),
-            nn.ConvTranspose2d(in_channels=128, out_channels=3, kernel_size=4, stride=2, bias=False, padding=1),
+            nn.ConvTranspose2d(
+                in_channels=features_g, 
+                out_channels=channels_img, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
             nn.Tanh()
         )
-        self.initialize_weights()
+        self._initialize_weights()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.projection(x)
-        x = x.view(-1, 1024, 4, 4)
+        x = x.view(-1, self.features_g * 8, 4, 4)
         return self.net(x)
 
-    def initialize_weights(self) -> None:
+    def _initialize_weights(self) -> None:
         for m in self.modules():
             if isinstance(m, nn.ConvTranspose2d):
                 nn.init.normal_(m.weight, 0, 0.02)
@@ -64,31 +103,70 @@ class Discriminator(nn.Module):
     Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks, Radford et al., 2016;
     https://arxiv.org/abs/1511.06434
     """ 
-    def __init__(self):
+    def __init__(
+            self,
+            channels_img: int=3,
+            features_d: int=128
+            ) -> None:
         super().__init__()
-
+        self.features_d = features_d
         self.net = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=128, kernel_size=4, stride=2, bias=False, padding=1),
+            nn.Conv2d(
+                in_channels=channels_img, 
+                out_channels=features_d, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
             nn.LeakyReLU(0.2, True),
-            nn.Conv2d(in_channels=128, out_channels=256, kernel_size=4, stride=2, bias=False, padding=1),
-            nn.BatchNorm2d(256), 
+            nn.Conv2d(
+                in_channels=features_d, 
+                out_channels=2*features_d, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
+            nn.BatchNorm2d(2*features_d), 
             nn.LeakyReLU(0.2, True),
-            nn.Conv2d(in_channels=256, out_channels=512, kernel_size=4, stride=2, bias=False, padding=1),
-            nn.BatchNorm2d(512), 
+            nn.Conv2d(
+                in_channels=2*features_d, 
+                out_channels=4*features_d, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
+            nn.BatchNorm2d(4*features_d), 
             nn.LeakyReLU(0.2, True),
-            nn.Conv2d(in_channels=512, out_channels=1024, kernel_size=4, stride=2, bias=False, padding=1),
-            nn.BatchNorm2d(1024),
+            nn.Conv2d(
+                in_channels=4*features_d, 
+                out_channels=8*features_d, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
+            nn.BatchNorm2d(8*features_d),
             nn.LeakyReLU(0.2, True),
-            nn.Conv2d(in_channels=1024, out_channels=1, kernel_size=4, stride=2, bias=False, padding=1),
+            nn.Conv2d(
+                in_channels=8*features_d, 
+                out_channels=1, 
+                kernel_size=4, 
+                stride=2, 
+                bias=False, 
+                padding=1
+            ),
             nn.Flatten(start_dim=1),
             nn.Sigmoid()
         )
-        self.initialize_weights()
+        self._initialize_weights()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
     
-    def initialize_weights(self) -> None:
+    def _initialize_weights(self) -> None:
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.normal_(m.weight, 0, 0.02)
@@ -116,13 +194,18 @@ class DiscriminatorLoss(nn.Module):
 
 class CelebA(Dataset):
     """
-    CelebA Dataset
+    CelebA Dataset.
     
     Reference:
     CelebFaces Attributes Dataset (CelebA) is a large-scale face attributes dataset with more than 200K celebrity images, each with 40 attribute annotations. 
     https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html 
     """
-    def __init__(self, csv_file: str, root_dir: str, transform=None) -> None:
+    def __init__(
+            self, 
+            root_dir: str, 
+            csv_file: str, 
+            transform=None
+        ) -> None:
         self.landmarks = pd.read_csv(csv_file)
         self.root_dir = root_dir
         self.transform = transform

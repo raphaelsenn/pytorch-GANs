@@ -1,3 +1,8 @@
+"""
+Author: Raphael Senn <raphaelsenn@gmx.de>
+Initial coding: 2025-07-14
+"""
+
 import torch
 import torch.nn as nn
 
